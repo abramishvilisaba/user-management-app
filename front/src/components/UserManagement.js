@@ -45,10 +45,11 @@ function UserManagement() {
     };
 
     useEffect(() => {
-        const initialSelectedUsers = users.reduce((selectedUser, userid) => {
-            selectedUser[userid] = false;
-            return selectedUser;
+        const initialSelectedUsers = usersArray.reduce((acc, user) => {
+            acc[user.id] = false;
+            return acc;
         }, {});
+        console.log("initialSelectedUsers" + initialSelectedUsers);
 
         setSelectedUsers(initialSelectedUsers);
     }, []);
