@@ -6,7 +6,7 @@ import jwtDecode from "jwt-decode";
 import mysql from "mysql2";
 import _ from "underscore";
 
-const pool = mysql.createPool({
+const connection = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,

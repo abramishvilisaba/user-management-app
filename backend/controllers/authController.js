@@ -14,6 +14,7 @@ const connection = mysql.createConnection({
     password: "nono1234",
     database: "users_app",
 });
+
 const port = process.env.PORT || 3001;
 const app = express();
 app.use(cors());
