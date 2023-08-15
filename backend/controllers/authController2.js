@@ -29,6 +29,7 @@ app.use(express.json());
 app.use(
     cors({
         origin: "https://user-management-app-joix.onrender.com",
+        origin: "http://localhost:3000",
     })
 );
 const secretKey = process.env.JWT_SECRET || "super-secret-key";

@@ -14,6 +14,8 @@ import _ from "underscore";
 const serverUrl =
     process.env.SERVER_URL || "https://user-management-app-api.onrender.com";
 
+// const serverUrl = "http://localhost:3001";
+
 function UserManagement() {
     const [users, setUsers] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
@@ -45,14 +47,14 @@ function UserManagement() {
     };
 
     useEffect(() => {
-        const initialSelectedUsers = usersArray.reduce((acc, user) => {
+        const initialSelectedUsers = users.reduce((acc, user) => {
             acc[user.id] = false;
             return acc;
         }, {});
         console.log("initialSelectedUsers" + initialSelectedUsers);
 
         setSelectedUsers(initialSelectedUsers);
-    }, []);
+    }, [users]);
 
     const getFormattedTimestamp = (registration_time) => {
         const date = new Date(registration_time);
