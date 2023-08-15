@@ -6,12 +6,12 @@ import jwtDecode from "jwt-decode";
 import mysql from "mysql2";
 import _ from "underscore";
 
-const connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "nono1234",
-    database: "users_app",
-});
+// const connection = mysql.createConnection({
+//     host: "localhost",
+//     user: "root",
+//     password: "nono1234",
+//     database: "users_app",
+// });
 
 const app = express();
 const port = process.env.PORT || 3001;
