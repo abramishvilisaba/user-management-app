@@ -67,12 +67,15 @@ function UserManagement() {
 
     const handleDelete = async (token, selectedUserIds) => {
         try {
-            const response = await axios.delete(`${serverUrl}/registerdelete`, {
-                data: { userIds: selectedUserIds },
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await axios.delete(
+                `${serverUrl}/user-management/delete`,
+                {
+                    data: { userIds: selectedUserIds },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
             console.log(response.data.message);
             fetchUserManagementData();
@@ -84,7 +87,7 @@ function UserManagement() {
     const handleBlock = async (token, selectedUserIds) => {
         try {
             await axios.patch(
-                `${serverUrl}/update`,
+                `${serverUrl}/user-management/update`,
 
                 { userIds: selectedUserIds, status: "blocked" },
                 {
@@ -103,7 +106,7 @@ function UserManagement() {
     const handleUnblock = async (token, selectedUserIds) => {
         try {
             await axios.patch(
-                `${serverUrl}/update`,
+                `${serverUrl}/user-management/update`,
                 {
                     userIds: selectedUserIds,
                     status: "active",
