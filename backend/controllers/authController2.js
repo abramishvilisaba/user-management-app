@@ -26,6 +26,11 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+app.use(
+    cors({
+        origin: "https://user-management-app-joix.onrender.com",
+    })
+);
 const secretKey = process.env.JWT_SECRET || "super-secret-key";
 
 async function getUsers() {
@@ -56,6 +61,7 @@ async function authenticateToken(req, res, next) {
     if (req) {
         try {
             const token = req.header("Authorization")?.split(" ")[1];
+            console.log("token" + token);
             if (!token) {
                 return res.status(401).json({ error: "No token provided" });
             }
@@ -82,39 +88,6 @@ async function authenticateToken(req, res, next) {
     } else {
         res.status(500).json({ error: "Internal server error" });
     }
-}
-
-function updateLastLogin() {
-    const selectQuery = "SELECT id FROM users WHERE username = ?";
-    connection.query(selectQuery, [username], (selectError, selectResults) => {
-        if (selectError) {
-            console.error("Error fetching user's id:", selectError);
-            connection.end();
-        } else {
-            if (selectResults.length > 0) {
-                const userId = selectResults[0].id;
-
-                // Update last_login_time using user's id
-                const updateQuery =
-                    "UPDATE users SET last_login_time = NOW() WHERE id = ?";
-                connection.query(
-                    updateQuery,
-                    [userId],
-                    (updateError, updateResults) => {
-                        if (updateError) {
-                            console.error(
-                                "Error updating last_login_time:",
-                                updateError
-                            );
-                        } else {
-                            console.log("Last login time updated successfully");
-                        }
-                        connection.end();
-                    }
-                );
-            }
-        }
-    });
 }
 
 async function updateLogin(userId) {
