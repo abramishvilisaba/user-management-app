@@ -166,13 +166,10 @@ app.delete("/user-management/delete", (req, res) => {
     console.log("delete");
     const { userIds } = req.body;
     console.log(userIds);
-
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
         return res.status(400).json({ error: "Invalid input" });
     }
-
     const query = "DELETE FROM users WHERE id IN (?)";
-
     connection.query(query, [userIds], (error, results) => {
         if (error) {
             console.error("Error deleting users:", error);

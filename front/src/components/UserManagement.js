@@ -21,6 +21,11 @@ function UserManagement() {
     const [userId, setUserId] = useState(0);
     const navigate = useNavigate();
     console.log(users);
+    console.log(selectedUsers);
+
+    useEffect(() => {
+        fetchUserManagementData();
+    }, []);
 
     const handleSelectAll = () => {
         setSelectAll(!selectAll);
@@ -38,6 +43,15 @@ function UserManagement() {
             })
         );
     };
+
+    useEffect(() => {
+        const initialSelectedUsers = users.reduce((selectedUser, userid) => {
+            selectedUser[userid] = false;
+            return selectedUser;
+        }, {});
+
+        setSelectedUsers(initialSelectedUsers);
+    }, []);
 
     const getFormattedTimestamp = (registration_time) => {
         const date = new Date(registration_time);
@@ -144,10 +158,6 @@ function UserManagement() {
             console.error("Invalid action:", action);
         }
     };
-
-    useEffect(() => {
-        fetchUserManagementData();
-    }, []);
 
     const selectedUserId = 0;
 
