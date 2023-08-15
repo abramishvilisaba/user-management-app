@@ -22,6 +22,7 @@ const connection = mysql.createConnection({
 
 const app = express();
 const port = process.env.PORT || 3001;
+const secretKey = process.env.JWT_SECRET || "super-secret-key";
 
 app.use(cors());
 app.use(express.json());
@@ -31,7 +32,15 @@ app.use(
         origin: "https://user-management-app-joix.onrender.com",
     })
 );
-const secretKey = process.env.JWT_SECRET || "super-secret-key";
+
+app.use(function (req, res, next) {
+    res.header(
+        "Access-Control-Allow-Origin",
+        "https://user-management-app-joix.onrender.com"
+    );
+    // Other headers and settings...
+    next();
+});
 
 async function getUsers() {
     const [rows] = await connection.promise().query("SELECT * FROM users");
