@@ -48,19 +48,14 @@ function registerUser(name, email, password, callback) {
 
 async function updateUserStatus(userIds, status) {
     const query = "UPDATE users SET status = ? WHERE id IN (?)";
-
     await connection.promise().query(query, [status, userIds]);
 }
 
 async function authenticateToken(req, res, next) {
     console.log("A------------------------------");
-    console.log(req.header("Authorization")?.split(" ")[1]);
-
     if (req) {
         try {
             const token = req.header("Authorization")?.split(" ")[1];
-            console.log("aaaaaaaaaaaaaaaaa");
-
             if (!token) {
                 return res.status(401).json({ error: "No token provided" });
             }
@@ -130,6 +125,7 @@ async function updateLogin(userId) {
 }
 
 app.post("/login", async (req, res) => {
+    console.log("login");
     const users = await getUsers();
     const user = users.find((user) => user.name === req.body.name);
     console.log(user);
