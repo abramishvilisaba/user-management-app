@@ -10,6 +10,8 @@ import _ from "underscore";
 //     faUnlockAlt,
 //     faTrashAlt,
 // } from "@fortawesome/free-solid-svg-icons";
+const serverUrl =
+    process.env.SERVER_URL || "https://user-management-app-api.onrender.com";
 
 function UserManagement() {
     const [users, setUsers] = useState([]);
@@ -45,7 +47,7 @@ function UserManagement() {
         const token = localStorage.getItem("token");
         try {
             axios
-                .get("http://localhost:3001/user-management", {
+                .get(`${serverUrl}/user-management`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

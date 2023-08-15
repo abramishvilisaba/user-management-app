@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const serverUrl =
+    process.env.SERVER_URL || "https://user-management-app-api.onrender.com";
+
 function Login() {
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
@@ -10,7 +13,7 @@ function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:3001/login", {
+            const response = await axios.post(`${serverUrl}/login`, {
                 name,
                 password,
             });

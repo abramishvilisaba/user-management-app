@@ -9,17 +9,18 @@ function RegistrationForm() {
 
     const navigate = useNavigate();
 
+    const serverUrl =
+        process.env.SERVER_URL ||
+        "https://user-management-app-api.onrender.com";
+
     const handleRegistration = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(
-                "http://localhost:3001/register",
-                {
-                    name,
-                    email,
-                    password,
-                }
-            );
+            const response = await axios.post(`${serverUrl}/register`, {
+                name,
+                email,
+                password,
+            });
             navigate("/login");
             console.log("Registration successful:", response.data);
         } catch (error) {
