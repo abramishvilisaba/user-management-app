@@ -13,6 +13,13 @@ const connection = mysql.createConnection({
     database: process.env.DB_DATABASE,
 });
 
+// const connection = mysql.createConnection({
+//     host: "localhost",
+//     user: "root",
+//     password: "nono1234",
+//     database: "users_app",
+// });
+
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -83,6 +90,45 @@ async function authenticateToken(req, res, next) {
     }
 }
 
+function updateLastLogin() {
+    const selectQuery = "SELECT id FROM users WHERE username = ?";
+    connection.query(selectQuery, [username], (selectError, selectResults) => {
+        if (selectError) {
+            console.error("Error fetching user's id:", selectError);
+            connection.end();
+        } else {
+            if (selectResults.length > 0) {
+                const userId = selectResults[0].id;
+
+                // Update last_login_time using user's id
+                const updateQuery =
+                    "UPDATE users SET last_login_time = NOW() WHERE id = ?";
+                connection.query(
+                    updateQuery,
+                    [userId],
+                    (updateError, updateResults) => {
+                        if (updateError) {
+                            console.error(
+                                "Error updating last_login_time:",
+                                updateError
+                            );
+                        } else {
+                            console.log("Last login time updated successfully");
+                        }
+                        connection.end();
+                    }
+                );
+            }
+        }
+    });
+}
+
+async function updateLogin(userId) {
+    console.log("update");
+    const query = "UPDATE users SET last_login_time = now() WHERE id = ?";
+    await connection.promise().query(query, [userId]);
+}
+
 app.post("/login", async (req, res) => {
     const users = await getUsers();
     const user = users.find((user) => user.name === req.body.name);
@@ -97,6 +143,7 @@ app.post("/login", async (req, res) => {
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
             const accessToken = jwt.sign({ id: user.id }, secretKey);
+            await updateLogin(user.id);
             // localStorage.setItem("token", accessToken);
             res.json({ accessToken });
         } else {

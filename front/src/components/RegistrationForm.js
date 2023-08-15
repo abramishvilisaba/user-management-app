@@ -13,6 +13,8 @@ function RegistrationForm() {
         process.env.SERVER_URL ||
         "https://user-management-app-api.onrender.com";
 
+    // const serverUrl = "http://localhost:3001";
+
     const handleRegistration = async (e) => {
         e.preventDefault();
         try {

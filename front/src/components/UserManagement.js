@@ -10,8 +10,11 @@ import _ from "underscore";
 //     faUnlockAlt,
 //     faTrashAlt,
 // } from "@fortawesome/free-solid-svg-icons";
+
 const serverUrl =
     process.env.SERVER_URL || "https://user-management-app-api.onrender.com";
+
+// const serverUrl = "http://localhost:3001";
 
 function UserManagement() {
     const [users, setUsers] = useState([]);
@@ -19,6 +22,7 @@ function UserManagement() {
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [userId, setUserId] = useState(0);
     const navigate = useNavigate();
+    console.log(users);
 
     const handleSelectAll = () => {
         setSelectAll(!selectAll);
@@ -54,25 +58,16 @@ function UserManagement() {
                 })
                 .then((response) => {
                     if (!response.data.length || response.data.length < 1) {
-                        // throw new Error("Users data is null or undefined");
                         navigate("/login");
                     }
                     setUsers(response.data);
                 });
         } catch (error) {
-            // console.error("Error fetching user data:", error);
             navigate("/login");
         }
     };
 
     const handleDelete = async (token, selectedUserIds) => {
-        // const token = localStorage.getItem("token");
-        // const selectedUserIds = Object.keys(selectedUsers).filter(
-        //     (userId) => selectedUsers[userId]
-        // );
-        // if (selectedUserIds.length === 0) {
-        //     return;
-        // }
         try {
             const response = await axios.delete(
                 "http://localhost:3001/user-management/delete",
@@ -84,7 +79,7 @@ function UserManagement() {
                 }
             );
 
-            console.log(response.data.message); // Success message from server
+            console.log(response.data.message);
             fetchUserManagementData();
         } catch (error) {
             console.error("Error deleting users:", error);
@@ -92,13 +87,6 @@ function UserManagement() {
     };
 
     const handleBlock = async (token, selectedUserIds) => {
-        // const token = localStorage.getItem("token");
-        // const selectedUserIds = Object.keys(selectedUsers)
-        //     .filter((userId) => selectedUsers[userId] === true)
-        //     .map(Number);
-        // if (selectedUserIds.length === 0) {
-        //     return;
-        // }
         try {
             await axios.patch(
                 `http://localhost:3001/user-management/update`,
@@ -118,14 +106,6 @@ function UserManagement() {
     };
 
     const handleUnblock = async (token, selectedUserIds) => {
-        // const selectedUserIds = Object.keys(selectedUsers)
-        //     .filter((userId) => selectedUsers[userId] === true)
-        //     .map(Number);
-        // if (selectedUserIds.length === 0) {
-        //     return;
-        // }
-
-        // const token = localStorage.getItem("token");
         try {
             await axios.patch(
                 `http://localhost:3001/user-management/update`,
@@ -155,13 +135,6 @@ function UserManagement() {
         if (!selectedUserIds || selectedUserIds.length === 0) {
             return;
         }
-        // action === "delete"
-        //     ? handleDelete(token, selectedUserIds)
-        //     : action === "block"
-        //     ? handleBlock(token, selectedUserIds)
-        //     : action === "unblock"
-        //     ? handleUnblock(token, selectedUserIds)
-        //     : null;
         if (action === "delete") {
             handleDelete(token, selectedUserIds);
         } else if (action === "block") {
@@ -171,50 +144,11 @@ function UserManagement() {
         } else {
             console.error("Invalid action:", action);
         }
-
-        // const requestOptions = {
-        //     headers: {
-        //         Authorization: `Bearer ${token}`,
-        //     },
-        // };
-
-        // const url =
-        //     action === "delete"
-        //         ? "http://localhost:3001/user-management/delete"
-        //         : "http://localhost:3001/user-management/update";
-
-        // const data =
-        //     action === "delete"
-        //         ? { userIds: selectedUserIds }
-        //         : {
-        //               userIds: selectedUserIds,
-        //               status: action === "block" ? "blocked" : "active",
-        //           };
-
-        // try {
-        //     const response = await axios[
-        //         action === "delete" ? "delete" : "patch"
-        //     ](url, data, requestOptions);
-        //     console.log(response.data.message);
-        //     fetchUserManagementData();
-        // } catch (error) {
-        //     navigate("/login");
-        //     console.error(`Error ${action}ing user:`, error);
-        // }
     };
 
     useEffect(() => {
         fetchUserManagementData();
     }, []);
-
-    // useEffect(() => {
-    //     const intervalId = setInterval(() => {
-    //         fetchUserManagementData();
-    //     }, 10000);
-    //     return () => {
-    //         clearInterval(intervalId);
-    //     };
-    // }, []);
 
     const selectedUserId = 0;
 
@@ -225,7 +159,6 @@ function UserManagement() {
                 <div className="flex">
                     <button
                         className="bg-red-500 text-white px-4 py-2 rounded mr-2"
-                        // onClick={() => handleBlock(selectedUserId)}
                         onClick={() => handleAction("block")}
                     >
                         {/* <FontAwesomeIcon icon={faBan} className="mr-1" /> */}
@@ -233,7 +166,6 @@ function UserManagement() {
                     </button>
                     <button
                         className="bg-green-500 text-white px-4 py-2 rounded mr-2"
-                        // onClick={() => handleUnblock(selectedUserId)}
                         onClick={() => handleAction("unblock")}
                     >
                         {/* <FontAwesomeIcon icon={faUnlockAlt} className="mr-1" />{" "} */}
@@ -241,7 +173,6 @@ function UserManagement() {
                     </button>
                     <button
                         className="bg-blue-500 text-white px-4 py-2 rounded"
-                        // onClick={() => handleDelete(selectedUserId)}
                         onClick={() => handleAction("delete")}
                     >
                         {/* <FontAwesomeIcon icon={faTrashAlt} className="mr-1" />{" "} */}
@@ -287,7 +218,11 @@ function UserManagement() {
                                   <td className="p-2">{user.name}</td>
                                   <td className="p-2">{user.email}</td>
                                   <td className="p-2">
-                                      {user.last_Login_Time}
+                                      {user.last_login_time
+                                          ? getFormattedTimestamp(
+                                                user.last_login_time
+                                            )
+                                          : null}
                                   </td>
                                   <td className="p-2">
                                       {getFormattedTimestamp(
