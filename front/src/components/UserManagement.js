@@ -14,8 +14,6 @@ import _ from "underscore";
 const serverUrl =
     process.env.SERVER_URL || "https://user-management-app-api.onrender.com";
 
-// const serverUrl = "http://localhost:3001";
-
 function UserManagement() {
     const [users, setUsers] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
