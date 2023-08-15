@@ -26,8 +26,11 @@ const secretKey = process.env.JWT_SECRET || "super-secret-key";
 
 app.use(express.json());
 
-app.use(cors());
-
+app.use(
+    cors({
+        origin: "https://user-management-app-joix.onrender.com",
+    })
+);
 // app.use(
 //     cors({
 //         origin: "https://user-management-app-joix.onrender.com",
