@@ -5,7 +5,7 @@ function Home() {
     return (
         <div className="flex justify-center items-center h-screen">
             <div className="text-center">
-                <h1 className="text-2xl font-semibold mb-4">
+                <h1 className="text-2xl font-semibold mb-16">
                     Welcome to the User Management App!
                 </h1>
                 <div className="mb-4">
