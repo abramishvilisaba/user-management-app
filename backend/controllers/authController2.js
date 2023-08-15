@@ -45,129 +45,129 @@ async function updateUserStatus(userIds, status) {
     await connection.promise().query(query, [status, userIds]);
 }
 
-// async function authenticateToken(req, res, next) {
-//     console.log("A------------------------------");
-//     console.log(req.header("Authorization")?.split(" ")[1]);
+async function authenticateToken(req, res, next) {
+    console.log("A------------------------------");
+    console.log(req.header("Authorization")?.split(" ")[1]);
 
-//     if (req) {
-//         try {
-//             const token = req.header("Authorization")?.split(" ")[1];
-//             console.log("aaaaaaaaaaaaaaaaa");
+    if (req) {
+        try {
+            const token = req.header("Authorization")?.split(" ")[1];
+            console.log("aaaaaaaaaaaaaaaaa");
 
-//             if (!token) {
-//                 return res.status(401).json({ error: "No token provided" });
-//             }
+            if (!token) {
+                return res.status(401).json({ error: "No token provided" });
+            }
 
-//             const decodedToken = jwtDecode(token);
-//             const currentUser = await getUserById(decodedToken.id);
-//             if (!currentUser || currentUser.status !== "active") {
-//                 console.log("User not found or status is not active");
-//                 // return res.status(401).json({ error: "User not authorized" });
-//                 res.json({});
-//             }
-//             jwt.verify(token, secretKey, (error, user) => {
-//                 if (error) {
-//                     return res.status(403).json({ error: "Token invalid" });
-//                 }
-//                 req.user = user;
-//             });
+            const decodedToken = jwtDecode(token);
+            const currentUser = await getUserById(decodedToken.id);
+            if (!currentUser || currentUser.status !== "active") {
+                console.log("User not found or status is not active");
+                // return res.status(401).json({ error: "User not authorized" });
+                res.json({});
+            }
+            jwt.verify(token, secretKey, (error, user) => {
+                if (error) {
+                    return res.status(403).json({ error: "Token invalid" });
+                }
+                req.user = user;
+            });
 
-//             next();
-//         } catch (error) {
-//             console.error("Error during authentication:", error);
-//             // res.status(500).json({ error: "Internal server error" });
-//             res.json({});
-//         }
-//     } else {
-//         res.status(500).json({ error: "Internal server error" });
-//     }
-// }
+            next();
+        } catch (error) {
+            console.error("Error during authentication:", error);
+            // res.status(500).json({ error: "Internal server error" });
+            res.json({});
+        }
+    } else {
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
 
-// app.post("/login", async (req, res) => {
-//     const users = await getUsers();
-//     const user = users.find((user) => user.name === req.body.name);
-//     console.log(user);
-//     if (user == null) {
-//         return res.status(400).send("Cannot find user");
-//     }
-//     if (user.status !== "active") {
-//         return res.status(403).send("User Not Active");
-//     }
+app.post("/login", async (req, res) => {
+    const users = await getUsers();
+    const user = users.find((user) => user.name === req.body.name);
+    console.log(user);
+    if (user == null) {
+        return res.status(400).send("Cannot find user");
+    }
+    if (user.status !== "active") {
+        return res.status(403).send("User Not Active");
+    }
 
-//     try {
-//         if (await bcrypt.compare(req.body.password, user.password)) {
-//             const accessToken = jwt.sign({ id: user.id }, secretKey);
-//             // localStorage.setItem("token", accessToken);
-//             res.json({ accessToken });
-//         } else {
-//             res.status(401).send("Authentication failed");
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).send();
-//     }
-// });
+    try {
+        if (await bcrypt.compare(req.body.password, user.password)) {
+            const accessToken = jwt.sign({ id: user.id }, secretKey);
+            // localStorage.setItem("token", accessToken);
+            res.json({ accessToken });
+        } else {
+            res.status(401).send("Authentication failed");
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send();
+    }
+});
 
-// app.post("/register", async (req, res) => {
-//     try {
-//         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-//         registerUser(req.body.name, req.body.email, hashedPassword);
-//         res.status(201).send();
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).send();
-//     }
-// });
+app.post("/register", async (req, res) => {
+    try {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        registerUser(req.body.name, req.body.email, hashedPassword);
+        res.status(201).send();
+    } catch (error) {
+        console.log(error);
+        res.status(500).send();
+    }
+});
 
-// app.use("/user-management", authenticateToken);
+app.use("/user-management", authenticateToken);
 
-// app.get("/user-management", async (req, res) => {
-//     try {
-//         const users = await getUsers();
-//         res.json(users);
-//     } catch (error) {
-//         console.log(error);
-//         // res.status(500).json({ error: "Internal server error" });
-//     }
-// });
+app.get("/user-management", async (req, res) => {
+    try {
+        const users = await getUsers();
+        res.json(users);
+    } catch (error) {
+        console.log(error);
+        // res.status(500).json({ error: "Internal server error" });
+    }
+});
 
-// app.patch("/user-management/update", async (req, res) => {
-//     const { userIds, status } = req.body;
+app.patch("/user-management/update", async (req, res) => {
+    const { userIds, status } = req.body;
 
-//     if (!userIds || !Array.isArray(userIds) || !status) {
-//         return res.status(400).json({ error: "Invalid input" });
-//     }
+    if (!userIds || !Array.isArray(userIds) || !status) {
+        return res.status(400).json({ error: "Invalid input" });
+    }
 
-//     try {
-//         await updateUserStatus(userIds, status);
-//         res.status(200).json({ message: "User statuses updated successfully" });
-//     } catch (error) {
-//         console.error("Error updating user statuses:", error);
-//         res.status(500).json({ error: "Error updating user statuses" });
-//     }
-// });
+    try {
+        await updateUserStatus(userIds, status);
+        res.status(200).json({ message: "User statuses updated successfully" });
+    } catch (error) {
+        console.error("Error updating user statuses:", error);
+        res.status(500).json({ error: "Error updating user statuses" });
+    }
+});
 
-// app.delete("/user-management/delete", (req, res) => {
-//     console.log("delete");
-//     const { userIds } = req.body;
-//     console.log(userIds);
+app.delete("/user-management/delete", (req, res) => {
+    console.log("delete");
+    const { userIds } = req.body;
+    console.log(userIds);
 
-//     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-//         return res.status(400).json({ error: "Invalid input" });
-//     }
+    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+        return res.status(400).json({ error: "Invalid input" });
+    }
 
-//     const query = "DELETE FROM users WHERE id IN (?)";
+    const query = "DELETE FROM users WHERE id IN (?)";
 
-//     connection.query(query, [userIds], (error, results) => {
-//         if (error) {
-//             console.error("Error deleting users:", error);
-//             res.status(500).json({ error: "Error deleting users" });
-//         } else {
-//             console.log("Users deleted successfully");
-//             res.status(200).json({ message: "Users deleted successfully" });
-//         }
-//     });
-// });
+    connection.query(query, [userIds], (error, results) => {
+        if (error) {
+            console.error("Error deleting users:", error);
+            res.status(500).json({ error: "Error deleting users" });
+        } else {
+            console.log("Users deleted successfully");
+            res.status(200).json({ message: "Users deleted successfully" });
+        }
+    });
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
