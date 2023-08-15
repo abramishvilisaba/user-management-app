@@ -123,6 +123,7 @@ function UserManagement() {
 
     const handleAction = async (action) => {
         const token = localStorage.getItem("token");
+        console.log(token);
         const selectedUserIds = Object.keys(selectedUsers)
             .filter((userId) => selectedUsers[userId] === true)
             .map(Number);

@@ -59,7 +59,6 @@ async function authenticateToken(req, res, next) {
             if (!token) {
                 return res.status(401).json({ error: "No token provided" });
             }
-
             const decodedToken = jwtDecode(token);
             const currentUser = await getUserById(decodedToken.id);
             if (!currentUser || currentUser.status !== "active") {
