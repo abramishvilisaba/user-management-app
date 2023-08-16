@@ -3,7 +3,7 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import jwtDecode from "jwt-decode";
-import mysql from "mysql2";
+import mysql from "mysql2/promise";
 import _ from "underscore";
 
 const connection = mysql.createConnection({
@@ -12,6 +12,12 @@ const connection = mysql.createConnection({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
 });
+
+setInterval(() => {
+    pool.query("SELECT 1").catch((err) => {
+        console.error("Error pinging the database:", err);
+    });
+}, 1 * 60 * 1000);
 
 const app = express();
 const port = process.env.PORT || 3001;
