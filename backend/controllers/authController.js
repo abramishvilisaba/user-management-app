@@ -11,13 +11,14 @@ const connection = mysql.createConnection({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
+    connectionLimit: 20,
 });
 
-setInterval(() => {
-    connection.query("SELECT 1").catch((err) => {
-        console.error("Error pinging the database:", err);
-    });
-}, 1 * 60 * 1000);
+// setInterval(() => {
+//     connection.query("SELECT 1").catch((err) => {
+//         console.error("Error pinging the database:", err);
+//     });
+// }, 1 * 60 * 1000);
 
 const app = express();
 const port = process.env.PORT || 3001;
