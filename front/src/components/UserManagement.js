@@ -4,12 +4,12 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import _ from "underscore";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faBan,
     faUnlockAlt,
     faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const serverUrl =
     process.env.SERVER_URL || "https://user-management-app-api.onrender.com";
