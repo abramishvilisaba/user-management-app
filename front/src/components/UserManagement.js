@@ -169,20 +169,20 @@ function UserManagement() {
                         className="bg-red-500 text-white px-4 py-2 rounded mr-2"
                         onClick={() => handleAction("block")}
                     >
-                        <FontAwesomeIcon icon={faBan} className="mr-1" />
-                        Block
+                        <FontAwesomeIcon icon={faBan} className="mr-1" /> Block
                     </button>
                     <button
                         className="bg-green-500 text-white px-4 py-2 rounded mr-2"
                         onClick={() => handleAction("unblock")}
                     >
-                        <FontAwesomeIcon icon={faUnlock} /> Unblock
+                        <FontAwesomeIcon icon={faUnlock} className="mr-1" />
+                        Unblock
                     </button>
                     <button
                         className="bg-blue-500 text-white px-4 py-2 rounded"
                         onClick={() => handleAction("delete")}
                     >
-                        <FontAwesomeIcon icon={faTrash} />
+                        <FontAwesomeIcon icon={faTrash} className="mr-1" />
                         Delete
                     </button>
                 </div>
