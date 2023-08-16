@@ -180,14 +180,14 @@ function UserManagement() {
                         className="bg-green-500 text-white px-4 py-2 rounded mr-2"
                         onClick={() => handleAction("unblock")}
                     >
-                        <FontAwesomeIcon icon={faUnlockAlt} className="mr-1" />{" "}
+                        <FontAwesomeIcon icon="fa-solid fa-ban" />
                         Unblock
                     </button>
                     <button
                         className="bg-blue-500 text-white px-4 py-2 rounded"
                         onClick={() => handleAction("delete")}
                     >
-                        <FontAwesomeIcon icon={faTrashAlt} className="mr-1" />{" "}
+                        <FontAwesomeIcon icon="fa-solid fa-ban" />
                         Delete
                     </button>
                 </div>
