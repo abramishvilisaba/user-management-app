@@ -34,12 +34,19 @@ app.use(
     })
 );
 
-async function getUsers() {
-    const [rows] = await pool.execute("SELECT * FROM users");
-    return rows;
+// async function getUsers() {
+//     const [rows] = await connection.promise().query("SELECT * FROM users");
+//     return rows;
+// }
 
-    // const [rows] = await connection.promise().query("SELECT * FROM users");
-    // return rows;
+async function getUsers() {
+    try {
+        const [rows] = await pool.execute("SELECT * FROM users");
+        return rows; // Make sure this is an array
+    } catch (error) {
+        console.error("Error getting users:", error);
+        throw error;
+    }
 }
 
 async function getUserById(id) {
