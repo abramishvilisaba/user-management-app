@@ -3,7 +3,7 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import jwtDecode from "jwt-decode";
-import mysql from "mysql2/promise";
+import mysql from "mysql2";
 import _ from "underscore";
 
 const connection = mysql.createConnection({
