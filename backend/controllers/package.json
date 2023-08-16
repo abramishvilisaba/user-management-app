@@ -5,8 +5,8 @@
     "description": "",
     "main": "authController.js",
     "scripts": {
-        "start": "node authController2",
-        "dev": "nodemon authController2",
+        "start": "node authController",
+        "dev": "nodemon authController",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
