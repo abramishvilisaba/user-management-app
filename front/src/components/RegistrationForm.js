@@ -23,10 +23,11 @@ function RegistrationForm() {
                 email,
                 password,
             });
-            navigate("/login");
             console.log("Registration successful:", response.data);
+            navigate("/login");
         } catch (error) {
             console.error("Registration error:", error);
+            alert(error.response.data.error);
         }
     };
 

@@ -31,9 +31,10 @@ app.use(
         origin: "https://user-management-app-joix.onrender.com",
     })
 );
+
 // app.use(
 //     cors({
-//         origin: "https://user-management-app-joix.onrender.com",
+//         origin: "http://localhost:3000",
 //     })
 // );
 
@@ -49,7 +50,7 @@ async function getUserById(id) {
     return rows[0];
 }
 
-function registerUser(name, email, password, callback) {
+async function registerUser(name, email, password, callback) {
     const query =
         "INSERT INTO users (name, email, password,registration_time) VALUES (?, ?, ?,NOW())";
     connection.query(query, [name, email, password], callback);
@@ -65,12 +66,13 @@ async function authenticateToken(req, res, next) {
     if (req) {
         try {
             const token = req.header("Authorization")?.split(" ")[1];
-            console.log("token" + token);
             if (!token) {
                 return res.status(401).json({ error: "No token provided" });
             }
             const decodedToken = jwtDecode(token);
+            console.log("1");
             const currentUser = await getUserById(decodedToken.id);
+            console.log("2");
             if (!currentUser || currentUser.status !== "active") {
                 console.log("User not found or status is not active");
                 // return res.status(401).json({ error: "User not authorized" });
@@ -104,7 +106,7 @@ app.post("/login", async (req, res) => {
     console.log("login");
     const users = await getUsers();
     const user = users.find((user) => user.name === req.body.name);
-    console.log(user);
+    // console.log(user);
     if (user == null) {
         return res.status(400).send("Cannot find user");
     }
@@ -113,6 +115,7 @@ app.post("/login", async (req, res) => {
     }
 
     try {
+        console.log("aaaaaaaaaaaaaaaaaaaaaa");
         if (await bcrypt.compare(req.body.password, user.password)) {
             const accessToken = jwt.sign({ id: user.id }, secretKey);
             await updateLogin(user.id);
@@ -130,8 +133,23 @@ app.post("/login", async (req, res) => {
 app.post("/register", async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        registerUser(req.body.name, req.body.email, hashedPassword);
-        res.status(201).send();
+        // await registerUser(req.body.name, req.body.email, hashedPassword);
+        await registerUser(
+            req.body.name,
+            req.body.email,
+            hashedPassword,
+            (error, results) => {
+                if (error) {
+                    console.error("Registration failed:", error);
+                    res.status(500).json({
+                        error: "Registration failed. User with this email already exists.",
+                    });
+                } else {
+                    console.log("Registration successful:", results);
+                    res.status(201).send();
+                }
+            }
+        );
     } catch (error) {
         console.log(error);
         res.status(500).send();
