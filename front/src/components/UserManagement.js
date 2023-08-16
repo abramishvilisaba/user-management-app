@@ -4,7 +4,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import _ from "underscore";
-import { faBan, faUnlock } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faUnlock, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const serverUrl =
@@ -182,6 +182,7 @@ function UserManagement() {
                         className="bg-blue-500 text-white px-4 py-2 rounded"
                         onClick={() => handleAction("delete")}
                     >
+                        <FontAwesomeIcon icon={faTrash} />
                         Delete
                     </button>
                 </div>
