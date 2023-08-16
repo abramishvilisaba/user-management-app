@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
 });
 
 setInterval(() => {
-    pool.query("SELECT 1").catch((err) => {
+    connection.query("SELECT 1").catch((err) => {
         console.error("Error pinging the database:", err);
     });
 }, 1 * 60 * 1000);
