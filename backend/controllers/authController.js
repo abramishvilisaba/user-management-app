@@ -6,21 +6,21 @@ import jwtDecode from "jwt-decode";
 import mysql from "mysql2";
 import _ from "underscore";
 
-// const connection = mysql.createConnection({
-//     host: process.env.DB_HOST,
-//     user: process.env.DB_USER,
-//     password: process.env.DB_PASSWORD,
-//     database: process.env.DB_DATABASE,
-//     connectionLimit: 20,
-// });
-
-const pool = mysql.createPool({
+const connection = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     connectionLimit: 20,
 });
+
+// const pool = mysql.createPool({
+//     host: process.env.DB_HOST,
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PASSWORD,
+//     database: process.env.DB_DATABASE,
+//     connectionLimit: 20,
+// });
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -34,47 +34,27 @@ app.use(
     })
 );
 
-// async function getUsers() {
-//     const [rows] = await connection.promise().query("SELECT * FROM users");
-//     return rows;
-// }
-
 async function getUsers() {
-    try {
-        const [rows] = await pool.execute("SELECT * FROM users");
-        return rows; // Make sure this is an array
-    } catch (error) {
-        console.error("Error getting users:", error);
-        throw error;
-    }
+    const [rows] = await connection.promise().query("SELECT * FROM users");
+    return rows;
 }
 
 async function getUserById(id) {
-    const [rows] = await pool.execute("SELECT * FROM users WHERE id = ?", [id]);
+    const [rows] = await connection
+        .promise()
+        .query("SELECT * FROM users WHERE id = ?", [id]);
     return rows[0];
-
-    // const [rows] = await connection
-    //     .promise()
-    //     .query("SELECT * FROM users WHERE id = ?", [id]);
-    // return rows[0];
 }
 
 async function registerUser(name, email, password, callback) {
     const query =
-        "INSERT INTO users (name, email, password, registration_time) VALUES (?, ?, ?, NOW())";
-    await pool.execute(query, [name, email, password]);
-
-    // const query =
-    //     "INSERT INTO users (name, email, password,registration_time) VALUES (?, ?, ?,NOW())";
-    // connection.query(query, [name, email, password], callback);
+        "INSERT INTO users (name, email, password,registration_time) VALUES (?, ?, ?,NOW())";
+    connection.query(query, [name, email, password], callback);
 }
 
 async function updateUserStatus(userIds, status) {
     const query = "UPDATE users SET status = ? WHERE id IN (?)";
-    await pool.execute(query, [status, userIds]);
-
-    // const query = "UPDATE users SET status = ? WHERE id IN (?)";
-    // await connection.promise().query(query, [status, userIds]);
+    await connection.promise().query(query, [status, userIds]);
 }
 
 async function authenticateToken(req, res, next) {
@@ -107,11 +87,8 @@ async function authenticateToken(req, res, next) {
 }
 
 async function updateLogin(userId) {
-    const query = "UPDATE users SET last_login_time = NOW() WHERE id = ?";
-    await pool.execute(query, [userId]);
-
-    // const query = "UPDATE users SET last_login_time = now() WHERE id = ?";
-    // await connection.promise().query(query, [userId]);
+    const query = "UPDATE users SET last_login_time = now() WHERE id = ?";
+    await connection.promise().query(query, [userId]);
 }
 
 app.post("/login", async (req, res) => {
@@ -195,26 +172,16 @@ app.delete("/user-management/delete", async (req, res) => {
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
         return res.status(400).json({ error: "Invalid input" });
     }
-    try {
-        const query = "DELETE FROM users WHERE id IN (?)";
-        await pool.execute(query, [userIds]);
-        console.log("Users deleted successfully");
-        res.status(200).json({ message: "Users deleted successfully" });
-    } catch (error) {
-        console.error("Error deleting users:", error);
-        res.status(500).json({ error: "Error deleting users" });
-    }
-
-    // const query = "DELETE FROM users WHERE id IN (?)";
-    // connection.query(query, [userIds], (error, results) => {
-    //     if (error) {
-    //         console.error("Error deleting users:", error);
-    //         res.status(500).json({ error: "Error deleting users" });
-    //     } else {
-    //         console.log("Users deleted successfully");
-    //         res.status(200).json({ message: "Users deleted successfully" });
-    //     }
-    // });
+    const query = "DELETE FROM users WHERE id IN (?)";
+    connection.query(query, [userIds], (error, results) => {
+        if (error) {
+            console.error("Error deleting users:", error);
+            res.status(500).json({ error: "Error deleting users" });
+        } else {
+            console.log("Users deleted successfully");
+            res.status(200).json({ message: "Users deleted successfully" });
+        }
+    });
 });
 
 app.listen(port, () => {
