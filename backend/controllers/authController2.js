@@ -13,13 +13,6 @@ const connection = mysql.createConnection({
     database: process.env.DB_DATABASE,
 });
 
-// const connection = mysql.createConnection({
-//     host: "localhost",
-//     user: "root",
-//     password: "nono1234",
-//     database: "users_app",
-// });
-
 const app = express();
 const port = process.env.PORT || 3001;
 const secretKey = process.env.JWT_SECRET || "super-secret-key";
@@ -31,12 +24,6 @@ app.use(
         origin: "https://user-management-app-joix.onrender.com",
     })
 );
-
-// app.use(
-//     cors({
-//         origin: "http://localhost:3000",
-//     })
-// );
 
 async function getUsers() {
     const [rows] = await connection.promise().query("SELECT * FROM users");
@@ -62,7 +49,6 @@ async function updateUserStatus(userIds, status) {
 }
 
 async function authenticateToken(req, res, next) {
-    console.log("A------------------------------");
     if (req) {
         try {
             const token = req.header("Authorization")?.split(" ")[1];
@@ -70,12 +56,9 @@ async function authenticateToken(req, res, next) {
                 return res.status(401).json({ error: "No token provided" });
             }
             const decodedToken = jwtDecode(token);
-            console.log("1");
             const currentUser = await getUserById(decodedToken.id);
-            console.log("2");
             if (!currentUser || currentUser.status !== "active") {
                 console.log("User not found or status is not active");
-                // return res.status(401).json({ error: "User not authorized" });
                 res.json({});
             }
             jwt.verify(token, secretKey, (error, user) => {
@@ -84,11 +67,9 @@ async function authenticateToken(req, res, next) {
                 }
                 req.user = user;
             });
-
             next();
         } catch (error) {
             console.error("Error during authentication:", error);
-            // res.status(500).json({ error: "Internal server error" });
             res.json({});
         }
     } else {
@@ -103,19 +84,15 @@ async function updateLogin(userId) {
 }
 
 app.post("/login", async (req, res) => {
-    console.log("login");
     const users = await getUsers();
     const user = users.find((user) => user.name === req.body.name);
-    // console.log(user);
     if (user == null) {
         return res.status(400).send("Cannot find user");
     }
     if (user.status !== "active") {
         return res.status(403).send("User Not Active");
     }
-
     try {
-        console.log("aaaaaaaaaaaaaaaaaaaaaa");
         if (await bcrypt.compare(req.body.password, user.password)) {
             const accessToken = jwt.sign({ id: user.id }, secretKey);
             await updateLogin(user.id);
@@ -133,7 +110,6 @@ app.post("/login", async (req, res) => {
 app.post("/register", async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        // await registerUser(req.body.name, req.body.email, hashedPassword);
         await registerUser(
             req.body.name,
             req.body.email,
@@ -164,17 +140,14 @@ app.get("/user-management", async (req, res) => {
         res.json(users);
     } catch (error) {
         console.log(error);
-        // res.status(500).json({ error: "Internal server error" });
     }
 });
 
 app.patch("/user-management/update", async (req, res) => {
     const { userIds, status } = req.body;
-
     if (!userIds || !Array.isArray(userIds) || !status) {
         return res.status(400).json({ error: "Invalid input" });
     }
-
     try {
         await updateUserStatus(userIds, status);
         res.status(200).json({ message: "User statuses updated successfully" });

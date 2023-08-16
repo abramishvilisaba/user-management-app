@@ -4,12 +4,12 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import _ from "underscore";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import {
-//     faBan,
-//     faUnlockAlt,
-//     faTrashAlt,
-// } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faBan,
+    faUnlockAlt,
+    faTrashAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 const serverUrl =
     process.env.SERVER_URL || "https://user-management-app-api.onrender.com";
@@ -173,21 +173,21 @@ function UserManagement() {
                         className="bg-red-500 text-white px-4 py-2 rounded mr-2"
                         onClick={() => handleAction("block")}
                     >
-                        {/* <FontAwesomeIcon icon={faBan} className="mr-1" /> */}
+                        <FontAwesomeIcon icon={faBan} className="mr-1" />
                         Block
                     </button>
                     <button
                         className="bg-green-500 text-white px-4 py-2 rounded mr-2"
                         onClick={() => handleAction("unblock")}
                     >
-                        {/* <FontAwesomeIcon icon={faUnlockAlt} className="mr-1" />{" "} */}
+                        <FontAwesomeIcon icon={faUnlockAlt} className="mr-1" />{" "}
                         Unblock
                     </button>
                     <button
                         className="bg-blue-500 text-white px-4 py-2 rounded"
                         onClick={() => handleAction("delete")}
                     >
-                        {/* <FontAwesomeIcon icon={faTrashAlt} className="mr-1" />{" "} */}
+                        <FontAwesomeIcon icon={faTrashAlt} className="mr-1" />{" "}
                         Delete
                     </button>
                 </div>
