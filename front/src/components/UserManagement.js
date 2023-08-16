@@ -175,14 +175,14 @@ function UserManagement() {
                         className="bg-green-500 text-white px-4 py-2 rounded mr-2"
                         onClick={() => handleAction("unblock")}
                     >
-                        <FontAwesomeIcon icon={faUnlock} className="mr-1" />
+                        <FontAwesomeIcon icon={faUnlock} className="mr-2" />
                         Unblock
                     </button>
                     <button
                         className="bg-blue-500 text-white px-4 py-2 rounded"
                         onClick={() => handleAction("delete")}
                     >
-                        <FontAwesomeIcon icon={faTrash} className="mr-1" />
+                        <FontAwesomeIcon icon={faTrash} className="mr-2" />
                         Delete
                     </button>
                 </div>
