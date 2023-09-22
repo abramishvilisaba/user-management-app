@@ -1,8 +1,10 @@
 # User Management Web Application
 
-![App Preview](app-preview.png)
+
 
 Welcome to the User Management Web Application! This application is designed to provide user registration and authentication capabilities with advanced user management features.
+
+![App Preview](app-preview.png)
 
 ## Features
 
