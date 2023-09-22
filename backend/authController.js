@@ -153,6 +153,14 @@ app.get("/user-management", async (req, res) => {
     }
 });
 
+app.get("/ping", async (req, res) => {
+    try {
+        res.status(200).json({ message: "Connected" });
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 app.patch("/user-management/update", async (req, res) => {
     const { userIds, status } = req.body;
     if (!userIds || !Array.isArray(userIds) || !status) {
