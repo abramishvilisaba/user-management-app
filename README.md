@@ -1,7 +1,5 @@
 # User Management Web Application
 
-
-
 Welcome to the User Management Web Application! This application is designed to provide user registration and authentication capabilities with advanced user management features.
 
 ![App Preview](app-preview.png)
@@ -33,8 +31,11 @@ Welcome to the User Management Web Application! This application is designed to 
 
 This project is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute the code for your purposes.
 
-## Author
+## Links
 
-- GitHub: [YourGitHubUsername](https://github.com/YourGitHubUsername)
+- GitHub: [github.com/abramishvilisaba/user-management-app](github.com/abramishvilisaba/user-management-app)
+- Live Demo: [user-management-app-joix.onrender.com](https://user-management-app-joix.onrender.com)
 
-Thank you for using the User Management Web Application! Enjoy secure user management and data control.
+- ## Author
+- 
+- GitHub: [github.com/abramishvilisaba](github.com/abramishvilisaba)
