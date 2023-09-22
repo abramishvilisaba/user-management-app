@@ -5,16 +5,11 @@ import jwt from "jsonwebtoken";
 import jwtDecode from "jwt-decode";
 import mysql from "mysql2";
 import _ from "underscore";
+import dotenv from "dotenv";
+import { User } from "./models/index.js";
+dotenv.config();
 
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    connectionLimit: 20,
-});
-
-// const pool = mysql.createPool({
+// const connection = mysql.createConnection({
 //     host: process.env.DB_HOST,
 //     user: process.env.DB_USER,
 //     password: process.env.DB_PASSWORD,
@@ -23,38 +18,33 @@ const connection = mysql.createConnection({
 // });
 
 const app = express();
+app.use(express.json());
 const port = process.env.PORT || 3001;
 const secretKey = process.env.JWT_SECRET || "super-secret-key";
 
-app.use(express.json());
-
-app.use(
-    cors({
-        origin: "https://user-management-app-joix.onrender.com",
-    })
-);
+const corsOptions = {
+    origin: process.env.ALLOWED_ORIGINS.split(","),
+};
+app.use(cors(corsOptions));
 
 async function getUsers() {
-    const [rows] = await connection.promise().query("SELECT * FROM users");
-    return rows;
+    const users = await User.findAll();
+    return users;
 }
 
 async function getUserById(id) {
-    const [rows] = await connection
-        .promise()
-        .query("SELECT * FROM users WHERE id = ?", [id]);
-    return rows[0];
+    const user = await User.findByPk(id);
+    return user;
 }
 
-async function registerUser(name, email, password, callback) {
-    const query =
-        "INSERT INTO users (name, email, password,registration_time) VALUES (?, ?, ?,NOW())";
-    connection.query(query, [name, email, password], callback);
+async function registerUser(name, email, password) {
+    const user = await User.create({ name, email, password });
+    return user;
 }
 
 async function updateUserStatus(userIds, status) {
-    const query = "UPDATE users SET status = ? WHERE id IN (?)";
-    await connection.promise().query(query, [status, userIds]);
+    const updatedUsers = await User.update({ status }, { where: { id: userIds } });
+    return updatedUsers;
 }
 
 async function authenticateToken(req, res, next) {
@@ -86,12 +76,23 @@ async function authenticateToken(req, res, next) {
     }
 }
 
-async function updateLogin(userId) {
-    const query = "UPDATE users SET last_login_time = now() WHERE id = ?";
-    await connection.promise().query(query, [userId]);
+async function updateLastLoginTime(userId) {
+    try {
+        const user = await User.findByPk(userId);
+        if (user) {
+            user.last_login_time = new Date();
+            await user.save();
+            console.log(`Updated 'last_login_time' for user with ID ${userId}`);
+        } else {
+            console.error(`User with ID ${userId} not found`);
+        }
+    } catch (error) {
+        console.error("Error updating last_login_time:", error);
+    }
 }
 
 app.post("/login", async (req, res) => {
+    console.log("login");
     const users = await getUsers();
     const user = users.find((user) => user.name === req.body.name);
     if (user == null) {
@@ -103,7 +104,8 @@ app.post("/login", async (req, res) => {
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
             const accessToken = jwt.sign({ id: user.id }, secretKey);
-            await updateLogin(user.id);
+            console.log("updateUserStatusToActive");
+            await updateLastLoginTime(user.id);
             // localStorage.setItem("token", accessToken);
             res.json({ accessToken });
         } else {
@@ -116,27 +118,27 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
+    console.log("/register");
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        await registerUser(
-            req.body.name,
-            req.body.email,
-            hashedPassword,
-            (error, results) => {
-                if (error) {
-                    console.error("Registration failed:", error);
-                    res.status(500).json({
-                        error: "Registration failed. User with this email already exists.",
-                    });
-                } else {
-                    console.log("Registration successful:", results);
-                    res.status(201).send();
-                }
-            }
-        );
+        const existingUser = await User.findOne({ where: { email: req.body.email } });
+        if (existingUser) {
+            console.error("Registration failed: User with this email already exists.");
+            return res.status(400).json({
+                error: "Registration failed. User with this email already exists.",
+            });
+        }
+        const newUser = await User.create({
+            name: req.body.name,
+            email: req.body.email,
+            password: hashedPassword,
+            status: "active",
+        });
+        console.log("Registration successful:", newUser);
+        res.status(201).send();
     } catch (error) {
-        console.log(error);
-        res.status(500).send();
+        console.error("Registration failed:", error);
+        res.status(500).json({ error: "Registration failed." });
     }
 });
 
@@ -166,22 +168,26 @@ app.patch("/user-management/update", async (req, res) => {
 });
 
 app.delete("/user-management/delete", async (req, res) => {
-    console.log("delete");
-    const { userIds } = req.body;
-    console.log(userIds);
-    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-        return res.status(400).json({ error: "Invalid input" });
-    }
-    const query = "DELETE FROM users WHERE id IN (?)";
-    connection.query(query, [userIds], (error, results) => {
-        if (error) {
-            console.error("Error deleting users:", error);
-            res.status(500).json({ error: "Error deleting users" });
-        } else {
+    try {
+        console.log("delete");
+        const { userIds } = req.body;
+        console.log(userIds);
+        if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+            return res.status(400).json({ error: "Invalid input" });
+        }
+        const deletedUsers = await User.destroy({ where: { id: userIds } });
+
+        if (deletedUsers > 0) {
             console.log("Users deleted successfully");
             res.status(200).json({ message: "Users deleted successfully" });
+        } else {
+            console.error("No users were deleted");
+            res.status(404).json({ error: "No users were deleted" });
         }
-    });
+    } catch (error) {
+        console.error("Error deleting users:", error);
+        res.status(500).json({ error: "Error deleting users" });
+    }
 });
 
 app.listen(port, () => {

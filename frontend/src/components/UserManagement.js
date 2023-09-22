@@ -4,13 +4,10 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import _ from "underscore";
-import { faBan, faUnlock, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faUnlock, faTrash, faCircleChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const serverUrl =
-    process.env.SERVER_URL || "https://user-management-app-api.onrender.com";
-
-// const serverUrl = "http://localhost:3001";
+const API_URL = process.env.REACT_APP_API_URL;
 
 function UserManagement() {
     const [users, setUsers] = useState([]);
@@ -27,10 +24,7 @@ function UserManagement() {
 
     const handleSelectAll = () => {
         setSelectAll(!selectAll);
-        const updatedSelectedUsers = _.mapObject(
-            selectedUsers,
-            () => !selectAll
-        );
+        const updatedSelectedUsers = _.mapObject(selectedUsers, () => !selectAll);
         setSelectedUsers(updatedSelectedUsers);
     };
 
@@ -62,7 +56,7 @@ function UserManagement() {
         const token = localStorage.getItem("token");
         try {
             axios
-                .get(`${serverUrl}/user-management`, {
+                .get(`${API_URL}/user-management`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -80,15 +74,12 @@ function UserManagement() {
 
     const handleDelete = async (token, selectedUserIds) => {
         try {
-            const response = await axios.delete(
-                `${serverUrl}/user-management/delete`,
-                {
-                    data: { userIds: selectedUserIds },
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const response = await axios.delete(`${API_URL}/user-management/delete`, {
+                data: { userIds: selectedUserIds },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
             console.log(response.data.message);
             fetchUserManagementData();
@@ -100,7 +91,7 @@ function UserManagement() {
     const handleBlock = async (token, selectedUserIds) => {
         try {
             await axios.patch(
-                `${serverUrl}/user-management/update`,
+                `${API_URL}/user-management/update`,
 
                 { userIds: selectedUserIds, status: "blocked" },
                 {
@@ -119,7 +110,7 @@ function UserManagement() {
     const handleUnblock = async (token, selectedUserIds) => {
         try {
             await axios.patch(
-                `${serverUrl}/user-management/update`,
+                `${API_URL}/user-management/update`,
                 {
                     userIds: selectedUserIds,
                     status: "active",
@@ -160,8 +151,18 @@ function UserManagement() {
 
     const selectedUserId = 0;
 
-    return users ? (
+    console.log(users);
+
+    return users.length ? (
         <div className="p-10 w-2/3 text-center m-auto">
+            <div className=" mx-auto mt-4 flex justify-start w-full h-fit">
+                <FontAwesomeIcon
+                    icon={faCircleChevronLeft}
+                    size="2xl"
+                    style={{ color: "#3b82f6", cursor: "pointer" }}
+                    onClick={() => navigate("/")}
+                />
+            </div>
             <h1 className="text-2xl font-semibold mb-8 ">User Management</h1>
             <div className="flex justify-between items-center mb-4">
                 <div className="flex">
@@ -191,50 +192,36 @@ function UserManagement() {
                 <thead>
                     <tr className="bg-gray-100">
                         <th className="p-2">
-                            <input
-                                type="checkbox"
-                                checked={selectAll}
-                                onChange={handleSelectAll}
-                            />
+                            <input type="checkbox" checked={selectAll} onChange={handleSelectAll} />
                         </th>
                         <th className="p-2">ID</th>
                         <th className="p-2">Name</th>
                         <th className="p-2">Email</th>
-                        <th className="p-2">Last Login Time</th>
                         <th className="p-2">Registration Time</th>
+                        <th className="p-2">Last Login Time</th>
                         <th className="p-2">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     {users.length
                         ? users.map((user) => (
-                              <tr
-                                  key={user.id}
-                                  className="border-t text-center"
-                              >
+                              <tr key={user.id} className="border-t text-center">
                                   <td className="p-2">
                                       <input
                                           type="checkbox"
                                           checked={selectedUsers[user.id]}
-                                          onChange={() =>
-                                              handleSelectUser(user.id)
-                                          }
+                                          onChange={() => handleSelectUser(user.id)}
                                       />
                                   </td>
                                   <td className="p-2">{user.id}</td>
                                   <td className="p-2">{user.name}</td>
                                   <td className="p-2">{user.email}</td>
                                   <td className="p-2">
-                                      {user.last_login_time
-                                          ? getFormattedTimestamp(
-                                                user.last_login_time
-                                            )
-                                          : null}
+                                      {user.createdAt && getFormattedTimestamp(user.createdAt)}
                                   </td>
                                   <td className="p-2">
-                                      {getFormattedTimestamp(
-                                          user.registration_time
-                                      )}
+                                      {user.last_login_time &&
+                                          getFormattedTimestamp(user.last_login_time)}
                                   </td>
                                   <td className="p-2">{user.status}</td>
                               </tr>
